@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.hw.model.dao.ProductDao">
+
+	<!-- 상품 등록 -->
+	<insert id="insertProduct" parameterType="Product">
+		INSERT INTO product (pCode, pName, price, quantity, brand, pDesc)
+		VALUES (#{pCode}, #{pName}, #{price}, #{quantity}, #{brand}, #{pDesc})
+	</insert>
+
+	<!-- 상품 삭제 -->
+	<delete id="deleteProduct" parameterType="String">
+		DELETE FROM product WHERE pCode = #{pCode}
+	</delete>
+	
+	<!-- 상품 업데이트 -->
+	<update id="updateProduct" parameterType="Product">
+		UPDATE product
+		SET pName = #{pName}, price = #{price}, quantity = #{quantity}, brand = #{brand}, pDesc = #{pDesc}
+		WHERE pCode = #{pCode}
+	</update>
+	
+	<!-- 하나의 상품 골라오기 -->
+	<select id="selectProductBypCode" parameterType="String" resultType="Product">
+		SELECT * FROM product 
+		WHERE pCode = #{pCode}
+	</select>
+	
+	<!-- 전체 상품 조회 -->
+	<!-- as로 알리아스 사용해서 자바형식으로 메핑하기 편하게 데이터의 이름을 변형시킨다 || Result_map으로 임시 DTO를 
+		선언해서 넣어준다. -->
+	<select id="selectProductBySearchConditionWithPaging" resultType="Product">
+		SELECT * FROM product
+				<!-- 어떤기준으로 검색을 할거냐  -->
+		<if test="key != 'none'">
+			WHERE ${key} like concat('%', #{word}, '%')
+		</if>
+		<!-- 어떤기준으로 어느방향으로 정렬할거냐  -->
+		<if test="orderBy != 'none'">
+			order by ${orderBy} ${orderByDir}
+		</if>
+			LIMIT ${limit} OFFSET ${offset}		
+	</select>
+	
+	<select id="numberOfSearchConditionWithPaging" resultType="int">
+		SELECT count(*) FROM product
+				<!-- 어떤기준으로 검색을 할거냐  -->
+		<if test="key != 'none'">
+			WHERE ${key} like concat('%', #{word}, '%')
+		</if>
+		<!-- 어떤기준으로 어느방향으로 정렬할거냐  -->
+		<if test="orderBy != 'none'">
+			order by ${orderBy} ${orderByDir}
+		</if>	
+	</select>
+	
+</mapper>
